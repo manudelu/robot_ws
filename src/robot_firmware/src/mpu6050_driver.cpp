@@ -19,6 +19,7 @@ extern "C" {
 #define SMPLRT_DIV     0x19
 #define CONFIG         0x1A
 #define GYRO_CONFIG    0x1B
+#define ACCEL_CONFIG   0x1C
 #define INT_ENABLE     0x38
 #define ACCEL_XOUT_H   0x3B
 #define ACCEL_YOUT_H   0x3D
@@ -56,23 +57,38 @@ class MPU6050_Driver : public rclcpp::Node {
         int _fd = -1;
 
         void timerCallback() {
-            if (!_is_connected)
-                if (!init_I2C())
+            if (!_is_connected) {
+                if (!init_I2C()) {
                     return;
+                }
+            }
 
             auto _imuMsg = sensor_msgs::msg::Imu();
             _imuMsg.header.frame_id = "base_footprint";
             _imuMsg.header.stamp = this->get_clock()->now();
 
-            // Accelerations [m/s^2]
-            _imuMsg.linear_acceleration.x = (double)read_raw_data(ACCEL_XOUT_H) / 1670.13;
-            _imuMsg.linear_acceleration.y = (double)read_raw_data(ACCEL_YOUT_H) / 1670.13;
-            _imuMsg.linear_acceleration.z = (double)read_raw_data(ACCEL_ZOUT_H) / 1670.13;
+            // Accel FS = 0 (+/- 2g) -> 16384 LSB/g * 9.80665m/s^2 = ~1670.73 LSB/(m/s^2)
+            const double ACCEL_SCALE = 1670.73; 
+            // Gyro FS = 3 (+/- 2000 deg/s) -> 16.4 LSB/(deg/s). To radians (so multiplied by 57,2958) -> 939.65 LSB/(rad/s)
+            const double GYRO_SCALE = 939.65;
 
-            // Angular Velocities [rad/s]
-            _imuMsg.angular_velocity.x = (double)read_raw_data(GYRO_XOUT_H) / 7509.55;
-            _imuMsg.angular_velocity.y = (double)read_raw_data(GYRO_YOUT_H) / 7509.55;
-            _imuMsg.angular_velocity.z = (double)read_raw_data(GYRO_ZOUT_H) / 7509.55;
+            int16_t raw_ax = read_raw_data(ACCEL_XOUT_H);
+            int16_t raw_ay = read_raw_data(ACCEL_YOUT_H);
+            int16_t raw_az = read_raw_data(ACCEL_ZOUT_H);
+
+            int16_t raw_gx = read_raw_data(GYRO_XOUT_H);
+            int16_t raw_gy = read_raw_data(GYRO_YOUT_H);
+            int16_t raw_gz = read_raw_data(GYRO_ZOUT_H);
+
+            // Accelerations [m/s^2]
+            _imuMsg.linear_acceleration.x = (double)raw_ax / ACCEL_SCALE;
+            _imuMsg.linear_acceleration.y = (double)raw_ay / ACCEL_SCALE;
+            _imuMsg.linear_acceleration.z = (double)raw_az / ACCEL_SCALE;
+
+            // Angula Velocities [rad/s]
+            _imuMsg.angular_velocity.x = (double)raw_gx / GYRO_SCALE;
+            _imuMsg.angular_velocity.y = (double)raw_gy / GYRO_SCALE;
+            _imuMsg.angular_velocity.z = (double)raw_gz / GYRO_SCALE;
 
             _pub->publish(_imuMsg);
         }
@@ -102,13 +118,15 @@ class MPU6050_Driver : public rclcpp::Node {
             // CONFIG: DLPF_CFG = 0 -> Gyroscope Output Rate = 8kHz
             // SMPLRT_DIV: Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV) = 8000[Hz] / (1 + 7) = 1kHz
             // GYRO_CONFIG: FS_SEL = 3 -> Gyroscope FUll Scale Range = +/- 2000°/s
+            // ACCEL CONFIG: AFS_SEL = 0 -> Accelerometer Full Scale Range = +/- 2g
             // PWR_MGMT_1: Wakes up the MPU6050 and sets the gyroscope x-axis as reference clock (CLKSEL = 1)
             // INT_ENABLE: Enable Interrupt PIN  (DATA_RDY_EN = 1)
-            if (i2c_smbus_write_byte_data(_fd, CONFIG, 0) < 0 ||
+            if (i2c_smbus_write_byte_data(_fd, CONFIG, 0x0) < 0 ||
                 i2c_smbus_write_byte_data(_fd, SMPLRT_DIV, 7) < 0 ||
-                i2c_smbus_write_byte_data(_fd, GYRO_CONFIG, 24) < 0 ||
+                i2c_smbus_write_byte_data(_fd, GYRO_CONFIG, 0x18) < 0 ||
                 i2c_smbus_write_byte_data(_fd, PWR_MGMT_1, 1) < 0 ||
-                i2c_smbus_write_byte_data(_fd, INT_ENABLE, 1) < 0) 
+                i2c_smbus_write_byte_data(_fd, INT_ENABLE, 1) < 0 ||
+                i2c_smbus_write_byte_data(_fd, ACCEL_CONFIG, 0x0) < 0) 
             {
                 RCLCPP_ERROR_THROTTLE(this->get_logger(), *this->get_clock(), 5000, "MPU6050 register configuration failed.");
                 close(_fd);
