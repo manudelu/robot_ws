@@ -9,7 +9,9 @@ void setup() {
 
 void loop() {
   if(Serial.available()) {
-    int x = Serial.readString().toInt();
+    String s = Serial.readStringUntil('\n');
+    int x = s.toInt();
+    
     if (x == 0) {
       digitalWrite(LED_PIN, LOW);
     } else {

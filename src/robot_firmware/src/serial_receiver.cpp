@@ -17,7 +17,7 @@ class SerialReceiver : public rclcpp::Node
             _arduino.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
 
             _pub = create_publisher<std_msgs::msg::String>("serial_receiver", 10);
-            _timer = create_wall_timer(0.01s, std::bind(&SerialReceiver::timerCallback, this));
+            _timer = create_wall_timer(10ms, std::bind(&SerialReceiver::timerCallback, this));
         }
 
         ~SerialReceiver()
@@ -32,12 +32,11 @@ class SerialReceiver : public rclcpp::Node
         std::string _port;
         
         void timerCallback() {
-            auto message = std_msgs::msg::String();
             if(rclcpp::ok() && _arduino.IsDataAvailable()) {
+                auto message = std_msgs::msg::String();
                 _arduino.ReadLine(message.data);
+                _pub->publish(message);
             }
-            
-            _pub->publish(message);
         }
 };
 

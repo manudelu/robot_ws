@@ -21,7 +21,7 @@ void setup() {
 
 void loop() {
   if(Serial.available()) {
-    cmd = Serial.readString().toDouble();
+    cmd = Serial.readStringUntil('\n').toDouble();
   }
 
   analogWrite(L298N_enA, cmd*100);

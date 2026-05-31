@@ -30,7 +30,7 @@ class SerialTransmitter : public rclcpp::Node
         std::string _port;
 
         void msgCallback(const std_msgs::msg::String &msg) {
-            _arduino.Write(msg.data);
+            _arduino.Write(msg.data + '\n');
         }
 };
 
