@@ -34,7 +34,7 @@ def generate_launch_description():
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            os.path.join(get_package_share_directory("ros_gz_sim"), "launch"), "/gz_sim_launch.py"]),
+            os.path.join(get_package_share_directory("ros_gz_sim"), "launch"), "/gz_sim.launch.py"]),
             launch_arguments=[
                 ("gz_args", [" -v 4", " -r", " empty.sdf"])
             ]
@@ -44,7 +44,7 @@ def generate_launch_description():
         package="ros_gz_sim",
         executable="create",
         output="screen",
-        arguments=["-topic", "robot_description", 
+        arguments=["-file", os.path.join(robot_description_dir, "urdf", "robot.urdf.xacro"), 
                    "-name", "robot"]
     )
 
