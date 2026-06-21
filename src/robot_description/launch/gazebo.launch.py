@@ -15,16 +15,22 @@ def generate_launch_description():
 
     model_arg = DeclareLaunchArgument(
         name="model",
-        default_value= os.path.join(robot_description_dir, "urdf", "robot.urdf.xacro"),
+        default_value=os.path.join(robot_description_dir, "urdf", "robot.urdf.xacro"),
         description="Absolute path to robot URDF file."
     )
-    
-    robot_description = ParameterValue(Command(["xacro ", LaunchConfiguration("model")]), value_type=str)
+
+    robot_description = ParameterValue(
+        Command(["xacro ", LaunchConfiguration("model")]),
+        value_type=str
+    )
 
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        parameters=[{"robot_description": robot_description}]
+        parameters=[{
+            "robot_description": robot_description,
+            "use_sim_time": True        
+        }]
     )
 
     gazebo_resource_path = SetEnvironmentVariable(
@@ -34,18 +40,20 @@ def generate_launch_description():
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            os.path.join(get_package_share_directory("ros_gz_sim"), "launch"), "/gz_sim.launch.py"]),
-            launch_arguments=[
-                ("gz_args", [" -v 4", " -r", " empty.sdf"])
-            ]
+            os.path.join(get_package_share_directory("ros_gz_sim"), "launch"),
+            "/gz_sim.launch.py"
+        ]),
+        launch_arguments=[("gz_args", [" -v 4", " -r", " empty.sdf"])]
     )
 
     gz_spawn_entity = Node(
         package="ros_gz_sim",
         executable="create",
         output="screen",
-        arguments=["-file", os.path.join(robot_description_dir, "urdf", "robot.urdf.xacro"), 
-                   "-name", "robot"]
+        arguments=[
+            "-topic", "/robot_description",
+            "-name", "robot",
+        ]
     )
 
     return LaunchDescription([
@@ -53,5 +61,5 @@ def generate_launch_description():
         robot_state_publisher,
         gazebo_resource_path,
         gazebo,
-        gz_spawn_entity
+        gz_spawn_entity,
     ])

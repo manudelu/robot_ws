@@ -44,4 +44,13 @@
         <maxVel>0.1</maxVel>
     </gazebo>
 
+    <!-- ROS2 Control Plugin -->
+    <gazebo>
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <parameters>
+                $(find robot_controller)/config/robot_controllers.yaml
+            </parameters>
+        </plugin>
+    </gazebo>
+
 </robot>
