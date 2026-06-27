@@ -6,31 +6,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(Eigen3 REQUIRED)
-
-include_directories(include)
-include_directories(${EIGEN3_INCLUDE_DIR})
-
-add_executable(controller src/controller.cpp)
-ament_target_dependencies(controller
-  rclcpp
-  std_msgs
-  geometry_msgs
-  ${Eigen_LIBRARIES}  
-)
-
-install(
-  DIRECTORY include
-  DESTINATION include
-)
-
-install(TARGETS
-  controller
-  DESTINATION lib/${PROJECT_NAME}
-)
 
 install(
   DIRECTORY config launch

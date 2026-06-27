@@ -10,10 +10,7 @@ def generate_launch_description():
     )
 
     controller = IncludeLaunchDescription(
-        os.path.join(get_package_share_directory("robot_controller"), "launch", "controller.launch.py"),
-        launch_arguments={
-            "use_simple_controller": "False"
-        }.items()
+        os.path.join(get_package_share_directory("robot_controller"), "launch", "controller.launch.py")
     )
 
     joystick = IncludeLaunchDescription(

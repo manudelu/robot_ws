@@ -1,22 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
-
-    wheel_radius_arg = DeclareLaunchArgument(
-        "wheel_radius",
-        default_value="0.033"
-    )
-
-    wheel_separation_arg = DeclareLaunchArgument(
-        "wheel_separation",
-        default_value="0.17"
-    )
-
-    wheel_radius = LaunchConfiguration("wheel_radius")
-    wheel_separation = LaunchConfiguration("wheel_separation")
 
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
@@ -27,26 +12,16 @@ def generate_launch_description():
             "/controller_manager"],
     )
 
-    velocity_controller_spawner = Node(
+    wheel_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=[
-            "simple_velocity_controller",
+            "robot_controller",
             "--controller-manager",
             "/controller_manager"],
     )
 
-    controller = Node(
-        package="robot_controller",
-        executable="controller",
-        parameters=[{"wheel_radius": wheel_radius,
-                     "wheel_separation": wheel_separation}]
-    )
-
     return LaunchDescription([
-        wheel_radius_arg,
-        wheel_separation_arg,
         joint_state_broadcaster_spawner,
-        velocity_controller_spawner,
-        controller
+        wheel_controller_spawner
     ])
