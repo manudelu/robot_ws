@@ -15,10 +15,18 @@ def generate_launch_description():
     )
 
     joy_teleop = Node(
-        package="joy_teleop",
-        executable="joy_teleop",
-        parameters=[
-            os.path.join(get_package_share_directory("robot_controller"), "config", "joy_teleop.yaml")
+        package="teleop_twist_joy",
+        executable="teleop_node",
+        name="teleop_twist_joy",
+        parameters=[{'enable_button': 7,
+                    'axis_linear.x': 1,
+                    'axis_angular.yaw': 0,
+                    'scale_linear.x': 1.0,
+                    'scale_angular.yaw': 1.0,
+                    'publish_stamped_twist': True 
+        }],
+        remappings=[
+            ('cmd_vel', '/robot_controller/cmd_vel')
         ]
     )
 
