@@ -47,8 +47,8 @@ class MPCController(Node):
         nx, nu, N = 3, 2, self.N
 
         # Symbolic dynamics: unicycle model, RK4 discretization
-        x = ca.SX.sym('x', nx)
-        u = ca.SX.sym('u', nu)
+        x = ca.SX.sym('x', nx)  # 1 x nx vector
+        u = ca.SX.sym('u', nu)  # 1 x nu vector
 
         def f(x, u):
             return ca.vertcat(
