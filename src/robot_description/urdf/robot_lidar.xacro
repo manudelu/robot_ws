@@ -15,6 +15,7 @@
             <geometry>
                 <mesh filename="package://robot_description/meshes/laser_link.STL"/> 
             </geometry> 
+            <material name="dark_grey"/>
         </visual>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -29,6 +30,6 @@
         <parent link="base_link"/>
         <child link="laser_link"/>
         <axis xyz="0 0 0"/>
-    </joint>
+    </joint> 
 
 </robot>

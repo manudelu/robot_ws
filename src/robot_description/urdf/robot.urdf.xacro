@@ -5,7 +5,7 @@
     <xacro:arg name="is_sim" default="true"/>
 
     <!-- Include .xacro files -->
-
+    <xacro:include filename="$(find robot_description)/urdf/materials.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/robot_gazebo.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/robot_ros2_control.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/robot_imu.xacro"/>
@@ -28,6 +28,7 @@
             <geometry>
                 <mesh filename="package://robot_description/meshes/base_link.STL"/>
             </geometry>
+            <material name="black"/>
         </visual>
         <collision>
             <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -50,6 +51,7 @@
             <geometry>
                 <mesh filename="package://robot_description/meshes/wheel_left_link.STL"/>
             </geometry>
+            <material name="blue"/>
         </visual>
         <collision>
             <origin rpy="-1.57 0 0" xyz="0 0.015 0"/>
@@ -72,6 +74,7 @@
             <geometry>
                 <mesh filename="package://robot_description/meshes/wheel_right_link.STL"/>
             </geometry>
+            <material name="blue"/>
         </visual>
         <collision>
             <origin rpy="-1.57 0 0" xyz="0 -0.015 0"/>
@@ -94,6 +97,7 @@
             <geometry>
                 <mesh filename="package://robot_description/meshes/caster_front_link.STL"/>
             </geometry>
+            <material name="silver"/>
         </visual>
         <collision>
             <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -116,6 +120,7 @@
             <geometry>
                 <mesh filename="package://robot_description/meshes/caster_rear_link.STL"/>
             </geometry>
+            <material name="silver"/>
         </visual>
         <collision>
             <origin rpy="0 0 0" xyz="0 0 0"/>

@@ -29,6 +29,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         parameters=[{
             "robot_description": robot_description,
+            "use_sim_time": True
         }]
     )
 
@@ -55,10 +56,24 @@ def generate_launch_description():
         ]
     )
 
+    gz_ros2_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
+            "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
+            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+        ],
+        remappings=[
+            ('/imu', '/imu/out'),
+        ]
+    )
+
     return LaunchDescription([
         model_arg,
         robot_state_publisher,
         gazebo_resource_path,
         gazebo,
         gz_spawn_entity,
+        gz_ros2_bridge,
     ])
