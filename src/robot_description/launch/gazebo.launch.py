@@ -63,6 +63,7 @@ def generate_launch_description():
             "/imu@sensor_msgs/msg/Imu[gz.msgs.IMU",
             "/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan",
             "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+            "/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image",
         ],
         remappings=[
             ('/imu', '/imu/out'),
