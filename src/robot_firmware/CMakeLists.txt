@@ -45,7 +45,7 @@ add_executable(mpu6050_driver src/mpu6050_driver.cpp)
 ament_target_dependencies(mpu6050_driver rclcpp sensor_msgs)
 target_link_libraries(mpu6050_driver i2c)
 
-pluginlib_export_plugin_description_file(hardware_interface src/robot_interface.xml)
+pluginlib_export_plugin_description_file(hardware_interface robot_interface.xml)
 install(
   TARGETS ${PROJECT_NAME}
   DESTINATION lib
