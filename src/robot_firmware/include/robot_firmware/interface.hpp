@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <libserial/SerialPort.h>
+#include <libserial/SerialStream.h>
 
 namespace robot_firmware {
 

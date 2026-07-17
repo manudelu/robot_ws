@@ -1,5 +1,6 @@
 #include "robot_firmware/interface.hpp"
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
+#include <pluginlib/class_list_macros.hpp>
 
 namespace robot_firmware {
     
@@ -76,6 +77,7 @@ namespace robot_firmware {
         {
             _arduino.Open(_port);
             _arduino.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         }
         catch (...)
         {
@@ -117,13 +119,19 @@ namespace robot_firmware {
             auto dt = (rclcpp::Clock().now() - _last_run).seconds();
 
             std::string message;
-            _arduino.ReadLine(message);
+            try {
+                _arduino.ReadLine(message, '\n', 10);
+            } catch (const LibSerial::ReadTimeout&) {
+                return hardware_interface::return_type::OK;
+            }
 
             std::stringstream ss(message);
             std::string res;
             int multiplier = 1;
 
             while(std::getline(ss, res, ',')) {
+                if (res.size() < 3) continue;
+                
                 multiplier = res.at(1) == 'p' ? 1 : -1;
                 
                 if (res.at(0) == 'r') {
@@ -143,16 +151,16 @@ namespace robot_firmware {
     hardware_interface::return_type RobotInterface::write(const rclcpp::Time& time, const rclcpp::Duration& period) {
         std::stringstream message_stream;
         char right_wheel_sign = _velocity_commands.at(0) >= 0 ? 'p' : 'n';
-        char left_wheel_sign  = _velocity_commands.at(0) >= 0 ? 'p' : 'n';
+        char left_wheel_sign  = _velocity_commands.at(1) >= 0 ? 'p' : 'n';
         std::string compensate_zeros_right = "";
         std::string compensate_zeros_left  = "";
 
-        if (std::abs(_velocity_commands.at(0)) <= 10.0)
+        if (std::abs(_velocity_commands.at(0)) < 10.0)
             compensate_zeros_right = "0";
         else
             compensate_zeros_right = "";
 
-        if (std::abs(_velocity_commands.at(1)) <= 10.0)
+        if (std::abs(_velocity_commands.at(1)) < 10.0)
             compensate_zeros_left = "0";
         else
             compensate_zeros_left = "";
@@ -177,5 +185,4 @@ namespace robot_firmware {
     }
 }
 
-#include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(robot_firmware::RobotInterface, hardware_interface::SystemInterface)

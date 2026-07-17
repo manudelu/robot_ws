@@ -16,7 +16,7 @@ def generate_launch_description():
             " is_sim:=False",
         ]),
         value_type=str
-    ),
+    )
 
     controller_manager = Node(
         package="controller_manager",
@@ -28,15 +28,16 @@ def generate_launch_description():
             },
             os.path.join(get_package_share_directory("robot_controller"), "config", "robot_controllers.yaml")
         ]
-    ),
+    )
 
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         parameters=[{
             "robot_description": robot_description,
+            "use_sim_time": False
         }]
-    ),
+    )
 
     return LaunchDescription(
         [

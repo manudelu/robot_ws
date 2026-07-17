@@ -3,7 +3,20 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    joy_node = Node(
+    joy_node_wired= Node(
+        package="joy_linux",
+        executable="joy_linux_node",
+        name="joystick",
+        parameters=[{
+            "dev": "/dev/input/js0",
+            "deadzone": 0.05,
+            "autorepeat_rate": 20.0,
+            "sticky_buttons": False,
+            "coalesce_interval_ms": 1
+        }]
+    )
+
+    joy_node_bluetooth = Node(
         package="joy",
         executable="joy_node",
         name="joystick",
@@ -22,7 +35,7 @@ def generate_launch_description():
         executable="teleop_node",
         name="teleop_twist_joy",
         parameters=[{
-            'enable_button': 7,
+            'enable_button': 5,
             'axis_linear.x': 1,
             'axis_angular.yaw': 0,
             'scale_linear.x': 1.0,
@@ -35,6 +48,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        joy_node,
+        joy_node_wired,
         joy_teleop
     ])

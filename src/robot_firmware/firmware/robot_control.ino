@@ -168,13 +168,13 @@ void loop() {
       leftWheelCmd = 0.0;
     }
     
-    //String encoderRead = "r" + rightEncoderSign + String(rightWheelMeasVel) + ",l" + leftEncoderSign + String(leftWheelMeasVel) + ",";
-    //Serial.println(encoderRead);
+    String encoderRead = "r" + rightEncoderSign + String(rightWheelMeasVel) + ",l" + leftEncoderSign + String(leftWheelMeasVel) + ",";
+    Serial.println(encoderRead);
     
     // PID tuning test on SerialPlotter
-    Serial.print(leftWheelCmdVel);
-    Serial.print(" ");
-    Serial.println(leftWheelMeasVel);
+    //Serial.print(leftWheelCmdVel);
+    //Serial.print(" ");
+    //Serial.println(leftWheelMeasVel);
 
     lastMs = currentMs;
 
